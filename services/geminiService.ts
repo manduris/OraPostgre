@@ -4,13 +4,14 @@ import { SYSTEM_INSTRUCTIONS, MODEL_NAME } from "../constants";
 import { ConversionType } from "../types";
 
 export class GeminiService {
-  private static ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
   static getModelName(): string {
     return MODEL_NAME;
   }
 
   static async convert(type: ConversionType, content: string): Promise<string> {
+    // Create new instance before each call to ensure up-to-date API key
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    
     const today = new Date().toISOString().split('T')[0];
     const instructionSource = SYSTEM_INSTRUCTIONS[type];
     const instruction = typeof instructionSource === 'function' 
@@ -18,7 +19,7 @@ export class GeminiService {
       : instructionSource;
     
     try {
-      const response = await this.ai.models.generateContent({
+      const response = await ai.models.generateContent({
         model: MODEL_NAME,
         contents: content,
         config: {
@@ -33,7 +34,8 @@ export class GeminiService {
       return text.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
     } catch (error) {
       console.error("Gemini conversion failed:", error);
-      throw new Error("Failed to convert content. Please check the console for details.");
+      // Re-throw to let App.tsx handle specific errors like project not found
+      throw error;
     }
   }
 }
