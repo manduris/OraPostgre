@@ -1,0 +1,5 @@
+{
+  "name": "Oracle to PostgreSQL Converter",
+  "description": "A professional-grade tool to convert Oracle SQL, MyBatis Mappers, and PL/SQL functions to PostgreSQL syntax using Gemini 3 Pro.",
+  "requestFramePermissions": []
+}
